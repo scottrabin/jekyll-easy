@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{ page.title }}</title>
+	{% for style in page.styles %}{{ style | as_stylesheet }}{% endfor %}
+	{% for script in page.scripts %}{{ script | as_script }}{% endfor %}
+</head>
+<body>
+{{content}}
+</body>
+</html>

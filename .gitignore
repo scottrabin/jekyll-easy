@@ -1,0 +1,5 @@
+# ignore the deploy directory
+deploy
+
+# ignore the build directory (no need to commit this separate from deploy)
+build
