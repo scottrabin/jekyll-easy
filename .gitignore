@@ -3,3 +3,6 @@ deploy
 
 # ignore the build directory (no need to commit this separate from deploy)
 build
+
+# ignore any vendor modules in source; these need to be in the deploy directory directly
+source/vendor

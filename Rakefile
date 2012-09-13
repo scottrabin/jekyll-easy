@@ -19,9 +19,14 @@ def ask question, answers = nil, default = nil
 	end
 end
 
+def project_name repository_url
+	repository_url[/\/([^\/]*?)(?:\.git)?$/, 1]
+end
+
+desc "Initialize your project's adaptation of Jekyll-Easy"
 task :init do |t|
 	repository_url = ask "Enter the read/write url for your Github repository (e.g. git@github.com:/scottrabin/jekyll-easy)"
-	base_url       = ask "Enter the subdirectory your pages will be hosted from", nil, repository_url[/\/([^\/]*?)(?:\.git)?$/, 1]
+	base_url       = ask "Enter the subdirectory your pages will be hosted from", nil, project_name(repository_url)
 
 	# update the local configuration for the proper baseurl
 	jekyll_config['baseurl'] = base_url
@@ -55,6 +60,7 @@ task :init do |t|
 	end
 end
 
+desc "Synchronize your Jekyll compiled output to your deployed site files"
 task :deploy do |t|
 	# clear out the old files from the deploy subdirectory (except vendor)
 	Dir["./#{config['deploy_dir']}/*"].each do |dir|
@@ -67,5 +73,37 @@ task :deploy do |t|
 	# prep the commit
 	cd config['deploy_dir'] do
 		system 'git add . && git add -u && git commit'
+	end
+end
+
+desc "Start a Jekyll server with the configured properties"
+task :server => ['submodule:sync'] do |t|
+	# copy the vendor files from the deploy directory to the source directory
+	cp_r "#{config['deploy_dir']}/vendor/.", "#{config['source_dir']}/vendor"
+	# run the server
+	system 'jekyll --auto --server'
+end
+
+desc "Manage deployed site submodules"
+namespace :submodule do
+	desc "Add a submodule as vendor code"
+	task :add do |t|
+		repository = ask "Vendor repository url"
+		module_name = ask "Local library name", nil, project_name(repository)
+
+		# go into the deploy directory and add the module there
+		cd config['deploy_dir'] do
+			system "git submodule add #{repository} vendor/#{module_name}"
+		end
+
+		# sync the module
+		Rake::Task['submodule:sync'].reenable
+		Rake::Task['submodule:sync'].invoke
+	end
+	desc "Initialize and update any deploy submodules"
+	task :sync do |t|
+		cd config['deploy_dir'] do
+			system 'git submodule init && git submodule update'
+		end
 	end
 end
