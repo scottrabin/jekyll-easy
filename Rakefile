@@ -35,6 +35,8 @@ task :init do |t|
 		system "git remote add origin #{repository_url}"
 		system "git config branch.master.remote origin"
 	end
+	# move the gh-pages source to its own branch
+	system 'git branch -m master gh-pages-source'
 	# wipe the local deploy directory
 	rm_r config['deploy_dir'], :force => true
 	# clone the repository into that location
