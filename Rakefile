@@ -29,7 +29,7 @@ task :init do |t|
 	base_url       = ask "Enter the subdirectory your pages will be hosted from", nil, project_name(repository_url)
 
 	# update the local configuration for the proper baseurl
-	jekyll_config['baseurl'] = base_url
+	jekyll_config['baseurl'] = "/#{base_url}"
 	File.open(jekyll_config_file, 'w') do |f|
 		f.puts jekyll_config.to_yaml
 	end
