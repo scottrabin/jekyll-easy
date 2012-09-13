@@ -79,6 +79,7 @@ end
 desc "Start a Jekyll server with the configured properties"
 task :server => ['submodule:sync'] do |t|
 	# copy the vendor files from the deploy directory to the source directory
+	rm_rf "#{config['source_dir']}/vendor"
 	cp_r "#{config['deploy_dir']}/vendor/.", "#{config['source_dir']}/vendor"
 	# run the server
 	system 'jekyll --auto --server'
